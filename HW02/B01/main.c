@@ -83,15 +83,21 @@ void insert(list **p, uint64_t address, size_t size) {
 int main(void) {
 
     list *head = NULL;
-
-    insert(&head, 140525067852320, 1);
-    insert(&head, 140525067852328, 8);
-    insert(&head, 140525067852700, 100);
-    insert(&head, 140525067852360, 20);
-    insert(&head, 140525067852500, 21);
-
-    printList(head);
+    /*
+        insert(&head, 140525067852320, 1);
+        insert(&head, 140525067852328, 8);
+        insert(&head, 140525067852700, 100);
+        insert(&head, 140525067852360, 20);
+        insert(&head, 140525067852500, 21);
+    */
     
+    /*====== Test #5 =======*/
+    for (int i = 1; i <=100; i +=2){
+      insert(&head, i, i+1);  
+    }
+    
+    printList(head);
+
     printf("%d\n", totalMemoryUsage(head));
 
     printf("%llu\n", findMaxBlock(head));
