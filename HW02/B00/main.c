@@ -78,7 +78,7 @@ int main(void) {
 
     printList(head);
 
-    printf("%llu", findMaxBlock(head));
+    printf("%llu", (uint64_t)findMaxBlock(head));
 
     return 0;
 }
