@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "C:/pdcurses/curses.h": "c",
+        "stdio.h": "c",
+        "time.h": "c"
+    }
+}
