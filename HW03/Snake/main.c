@@ -140,7 +140,7 @@ void goTail(struct snake_t *head)
     head->tail[0].y = head->y;
 }
 
-//функция прверки столновения головы змейки с хвостом
+//функция прверки столновения головы змейки с хвостом возвращает 1 при столкновение
 int snakeCollision(struct snake_t *head){
     for(size_t i = 1; i < head->tsize; i++)
     {
@@ -189,6 +189,7 @@ int main()
                 frame_count = 0;
                 last_frame_time = current_frame_time;
             }
+            //при столкновении выходим из игры
             if (snakeCollision(snake))
             {
                 break;
