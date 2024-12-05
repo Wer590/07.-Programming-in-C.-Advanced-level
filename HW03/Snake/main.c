@@ -8,8 +8,7 @@
 
 #define MIN_Y  2
 enum {LEFT=1, UP, RIGHT, DOWN, STOP_GAME=KEY_F(10)};
-enum {MAX_TAIL_SIZE=100, START_TAIL_SIZE=3, MAX_FOOD_SIZE=20, FOOD_EXPIRE_SECONDS=10};
-
+enum {MAX_TAIL_SIZE=100, START_TAIL_SIZE=3, MAX_FOOD_SIZE=20, FOOD_EXPIRE_SECONDS=10, CONTROLS=3};
 
 // Здесь храним коды управления змейкой
 struct control_buttons
@@ -18,10 +17,11 @@ struct control_buttons
     int up;
     int left;
     int right;
-}control_buttons;
+}control_buttons[CONTROLS];
 
-struct control_buttons default_controls = {KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT};
-
+struct control_buttons default_controls[CONTROLS] = {{KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT},
+                                                    {'s', 'w', 'a', 'd'},
+                                                    {'S', 'W', 'A', 'D'}};
 /*
  Голова змейки содержит в себе
  x,y - координаты текущей позиции
@@ -70,7 +70,7 @@ tail_t*  tail  = (tail_t*) malloc(MAX_TAIL_SIZE*sizeof(tail_t));
     initHead(head, x, y);
     head->tail = tail; // прикрепляем к голове хвост
     head->tsize = size+1;
-    head->controls = default_controls;
+    head->controls = default_controls[0];
 }
 
 /*
@@ -96,7 +96,7 @@ void go(struct snake_t *head)
             mvprintw(head->y, ++(head->x), "%c", ch);
         break;
         case UP:
-            if(head->y <= 1) //Здесь проверка идет от первой строки, чтобы не затирать нулевую строку
+            if(head->y <= MIN_Y) //Здесь проверка идет от первой строки, чтобы не затирать нулевую строку
                 head->y = max_y;
             mvprintw(--(head->y), head->x, "%c", ch);
         break;
@@ -113,14 +113,19 @@ void go(struct snake_t *head)
 
 void changeDirection(struct snake_t* snake, const int32_t key)
 {
-    if (key == snake->controls.down)
-        snake->direction = DOWN;
-    else if (key == snake->controls.up)
-        snake->direction = UP;
-    else if (key == snake->controls.right)
-        snake->direction = RIGHT;
-    else if (key == snake->controls.left)
-        snake->direction = LEFT;
+    for(int i=0; i < CONTROLS; i++)
+    {
+        snake->controls = default_controls[i];
+        if (key == snake->controls.down)
+            snake->direction = DOWN;
+        else if (key == snake->controls.up)
+            snake->direction = UP;
+        else if (key == snake->controls.right)
+            snake->direction = RIGHT;
+        else if (key == snake->controls.left)
+            snake->direction = LEFT;  
+    }
+    
 }
 
 /*
@@ -159,7 +164,7 @@ int main()
     raw();                // Откдючаем line buffering
     noecho();            // Отключаем echo() режим при вызове getch
     curs_set(FALSE);    //Отключаем курсор
-    mvprintw(0, 0,"Use arrows for control. Press 'F10' for EXIT");
+    mvprintw(0, 1,"Use arrows for control. Press 'F10' for EXIT");
     timeout(0);    //Отключаем таймаут после нажатия клавиши в цикле
     
     int key_pressed = 0;
