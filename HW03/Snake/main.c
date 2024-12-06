@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "c:/pdcurses/curses.h" //тут необходимо указать свой путь до места расположения curses.h
+#include "C:/PDCurses-master/curses.h" //тут необходимо указать свой путь до места расположения curses.h
 #include <inttypes.h>
 #include <string.h>
 //#include <unistd.h>
@@ -56,18 +56,18 @@ void initTail(struct tail_t t[], size_t size)
         t[i]=init_t;
     }
 }
-void initHead(struct snake_t *head, int x, int y)
+void initHead(struct snake_t *head, int x, int y, int direction)
 {
     head->x = x;
     head->y = y;
-    head->direction = RIGHT;
+    head->direction = direction;
 }
 
-void initSnake(snake_t *head, size_t size, int x, int y)
+void initSnake(snake_t *head, size_t size, int x, int y, int direction)
 {
 tail_t*  tail  = (tail_t*) malloc(MAX_TAIL_SIZE*sizeof(tail_t));
     initTail(tail, MAX_TAIL_SIZE);
-    initHead(head, x, y);
+    initHead(head, x, y, direction);
     head->tail = tail; // прикрепляем к голове хвост
     head->tsize = size+1;
     head->controls = default_controls[0];
@@ -144,9 +144,10 @@ void goTail(struct snake_t *head)
     head->tail[0].x = head->x;
     head->tail[0].y = head->y;
 }
-
-//функция прверки столновения головы змейки с хвостом возвращает 1 при столкновение
-int snakeCollision(struct snake_t *head){
+/*
+ функция прверки столновения головы змейки с хвостом возвращает 1 при столкновение
+*/
+int checkCollision(struct snake_t *head){
     for(size_t i = 1; i < head->tsize; i++)
     {
         if ((head->x == head->tail[i].x) && (head->y == head->tail[i].y))
@@ -154,27 +155,67 @@ int snakeCollision(struct snake_t *head){
     }    
     return 0;
 }
+/*
+ Функция проверки корректности выбора направления движения в независимости от типа управления
+*/
+int checkDirection(snake_t* snake, int32_t key)
+{
+	for (int i = 0; i < CONTROLS; i++)
+	{
+		if(((snake->direction == LEFT) && (key == default_controls[i].right)) ||\
+		   ((snake->direction == RIGHT) && (key == default_controls[i].left)) ||\
+		   ((snake->direction == UP) && (key == default_controls[i].down)) ||\
+		   ((snake->direction == DOWN) && (key == default_controls[i].up)))
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+/*
+ Функция game over
+*/
+void gameOver(void)
+{
+	int max_x=0, max_y=0;
+    getmaxyx(stdscr, max_y, max_x); // macro - размер терминала
+    //mvprintw(1, 0, "max_y = %d, max_x = %d", max_y, max_x);
+    //выводим по центру экрана терминала
+	mvprintw((max_y/2), ((max_x/2)-5), "GAME OVER");
+    mvprintw(((max_y/2)+1), ((max_x/2)-15),"Press any key to continue ...");
+    timeout(-1);
+    getch();
+}
 
 int main()
 {
     snake_t* snake = (snake_t*)malloc(sizeof(snake_t));
-    initSnake(snake,START_TAIL_SIZE,10,10);
     initscr();
+    //-----------------------*******-----------------------
+    //Инициализируем змейку в случайных координатах X Y 
+    //и случайное направление движения   
+    int max_x=0, max_y=0;
+    getmaxyx(stdscr, max_y, max_x); // macro - размер терминала  
+    srand(time(NULL));
+    int x = rand()% (max_x - 1);
+    int y = rand()% (max_y - 2) + 1;
+    int direction = (rand() % 4) + 1;
+    //-----------------------*******-----------------------
+    initSnake(snake, START_TAIL_SIZE, x, y, direction);
     keypad(stdscr, TRUE); // Включаем F1, F2, стрелки и т.д.
-    raw();                // Откдючаем line buffering
+    raw();                // Отключаем line buffering
     noecho();            // Отключаем echo() режим при вызове getch
     curs_set(FALSE);    //Отключаем курсор
-    mvprintw(0, 1,"Use arrows for control. Press 'F10' for EXIT");
+    mvprintw(0, 1, "Use arrows for control. Press 'F10' for EXIT");
     timeout(0);    //Отключаем таймаут после нажатия клавиши в цикле
-    
+
     int key_pressed = 0;
     int frame_count = 0;
 
     clock_t last_time = clock();
-    clock_t frame_time = CLOCKS_PER_SEC / 10; 
+    clock_t frame_time = CLOCKS_PER_SEC / 15; 
     
     clock_t last_frame_time = clock();
-
 
     while( key_pressed != STOP_GAME )
     {
@@ -186,7 +227,10 @@ int main()
             key_pressed = getch(); // Считываем клавишу
             go(snake);
             goTail(snake);
-            changeDirection(snake, key_pressed);
+            if (checkDirection(snake, key_pressed))
+            {
+				changeDirection(snake, key_pressed);
+			}
             frame_count ++;
             if ((current_frame_time - last_frame_time) >= CLOCKS_PER_SEC)
             {
@@ -195,8 +239,9 @@ int main()
                 last_frame_time = current_frame_time;
             }
             //при столкновении выходим из игры
-            if (snakeCollision(snake))
+            if (checkCollision(snake))
             {
+                gameOver();
                 break;
             }  
             last_time = current_time;
