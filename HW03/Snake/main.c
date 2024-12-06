@@ -181,7 +181,7 @@ void gameOver(void)
     getmaxyx(stdscr, max_y, max_x); // macro - размер терминала
     //mvprintw(1, 0, "max_y = %d, max_x = %d", max_y, max_x);
     //выводим по центру экрана терминала
-	mvprintw((max_y/2), ((max_x/2)-5), "GAME OVER");
+    mvprintw((max_y/2), ((max_x/2)-5), "GAME OVER");
     mvprintw(((max_y/2)+1), ((max_x/2)-15),"Press any key to continue ...");
     timeout(-1);
     getch();
@@ -229,8 +229,8 @@ int main()
             goTail(snake);
             if (checkDirection(snake, key_pressed))
             {
-				changeDirection(snake, key_pressed);
-			}
+                changeDirection(snake, key_pressed);
+            }
             frame_count ++;
             if ((current_frame_time - last_frame_time) >= CLOCKS_PER_SEC)
             {
