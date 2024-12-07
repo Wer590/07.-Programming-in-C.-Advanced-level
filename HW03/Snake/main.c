@@ -177,7 +177,7 @@ int checkDirection(snake_t* snake, int32_t key)
 */
 void gameOver(void)
 {
-	int max_x=0, max_y=0;
+    int max_x=0, max_y=0;
     getmaxyx(stdscr, max_y, max_x); // macro - размер терминала
     //mvprintw(1, 0, "max_y = %d, max_x = %d", max_y, max_x);
     //выводим по центру экрана терминала
