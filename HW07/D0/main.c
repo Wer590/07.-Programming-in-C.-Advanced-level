@@ -72,7 +72,7 @@ int main(void)
 	struct list *head = &list;
 	head = calloc(1,sizeof(struct list));
 
-	char input_str[500];
+	char input_str[1000];
 	fgets(input_str, sizeof(input_str), stdin);
 
 	int len = strlen(input_str);
