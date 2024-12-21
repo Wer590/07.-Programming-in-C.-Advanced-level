@@ -39,18 +39,18 @@ void btUpView(tree *root)
 		}
 		printf("%d ", root->key);
 }
-	void outorder(tree *root, int key)
+	void outorder(tree *root)
 	{
 		if( root == NULL)
 			return;
-		if (key == 1)
-			printf("%d ", root->key);
+
+		printf("%d ", root->key);
 		if((root->right))
-			outorder(root->right, 1);
+			outorder(root->right);
 	}
 	inorder(root);
-
-	outorder(root, 0);
+	if ( root && root->right)
+		outorder(root->right);
 	printf("\n");
 }
 
