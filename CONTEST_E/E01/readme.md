@@ -7,19 +7,25 @@ Submit a solution for E1-Двоичные нули
 Examples
 
 Input
+
 8 1
 
 Output
+
 3
 
 Input
+
 13 2
 
 Output
+
 4
 
 Input
+
 1000 5
 
 Output
+
 210
